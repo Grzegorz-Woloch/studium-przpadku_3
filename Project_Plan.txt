@@ -1,3 +1,4 @@
 Utworzenie repozytorium
 Klonowanie lokalne
 Git commit/add/push 
+cokolwiek
