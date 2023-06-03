@@ -1,0 +1,496 @@
+openapi: 3.0.3
+info:
+  title: WorldWords OpenAPI 3.0
+  description: |-
+    This is the WorldWords Language School API based on the OpenAPI 3.0 specification.
+    Project for StudiumPrzypadku_3.
+  contact:
+    email: apiteam@swagger.io
+  version: 0.0.1
+tags:
+  - name: courses
+    description: Everything about our courses
+  - name: user
+    description: Operations about user
+paths:
+  /courses:
+    put:
+      tags:
+        - course
+      summary: Update an existing course
+      description: Update an existing course by Id
+      operationId: updatecourse
+      requestBody:
+        description: Update an existent course in the school
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Course'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Course'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: course not found
+        '405':
+          description: Validation exception
+    post:
+      tags:
+        - course
+      summary: Add a new course to the school
+      description: Add a new course to the school
+      operationId: addCourse
+      requestBody:
+        description: Create a new course in the school
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Course'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Course'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '405':
+          description: Invalid input
+      security:
+        - coursestore_auth:
+            - write:course
+            - read:course
+  /courses/findByStatus:
+    get:
+      tags:
+        - course
+      summary: Finds courses by status
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findCoursesByStatus
+      parameters:
+        - name: status
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: available
+            enum:
+              - available
+              - pending
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '400':
+          description: Invalid status value
+      security:
+        - coursestore_auth:
+            - write:courses
+            - read:courses
+  /courses/findByTags:
+    get:
+      tags:
+        - course
+      summary: Finds Courses by tags
+      description: Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+      operationId: findCoursesByTags
+      parameters:
+        - name: tags
+          in: query
+          description: Tags to filter by
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '400':
+          description: Invalid tag value
+      security:
+        - coursestore_auth:
+            - write:courses
+            - read:courses
+  /courses/{courseId}:
+    get:
+      tags:
+        - course
+      summary: Find course by ID
+      description: Returns a single course
+      operationId: getCourseById
+      parameters:
+        - name: courseId
+          in: path
+          description: ID of course to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: course not found
+      security:
+        - api_key: []
+        - coursestore_auth:
+            - write:course
+            - read:course
+    post:
+      tags:
+        - course
+      summary: Updates a course in the school with form data
+      description: ''
+      operationId: updateCourseWithForm
+      parameters:
+        - name: courseId
+          in: path
+          description: ID of course that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: query
+          description: Name of course that needs to be updated
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status of course that needs to be updated
+          schema:
+            type: string
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - coursestore_auth:
+            - write:course
+            - read:course
+    delete:
+      tags:
+        - course
+      summary: Deletes a course
+      description: delete a course
+      operationId: deleteCourse
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: courseId
+          in: path
+          description: course id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid course value
+      security:
+        - coursestore_auth:
+            - write:course
+            - read:course
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /user/{username}:
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      description: ''
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - user
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the school
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+      xml:
+        name: user
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: tag
+    Course:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: Basic English
+        tags:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        status:
+          type: string
+          description: course status in the school
+          enum:
+            - available
+            - pending
+            - not available
+      xml:
+        name: course
+  requestBodies:
+    course:
+      description: course object that needs to be added to the school
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Course'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Course'
+  securitySchemes:
+    coursestore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://coursesstore3.swagger.io/oauth/authorize
+          scopes:
+            write:courses: modify courses in your account
+            read:courses: read your courses
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
